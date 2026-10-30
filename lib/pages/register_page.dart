@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/text_field.dart';
 import 'profile_page.dart';
+import '../routes.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -38,18 +39,13 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _register() {
-    if (_formKey.currentState?.validate() ?? false) {
+    if (_formKey.currentState?.validate() ??
+        false) {
+
       FocusScope.of(context).unfocus();
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProfilePage(
-            name: _nameController.text,
-            email: _emailController.text,
-          ),
-        ),
-      );
+      // Возвращаемся на экран входа.
+      Navigator.pop(context);
     }
   }
 

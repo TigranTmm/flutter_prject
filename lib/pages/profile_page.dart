@@ -5,11 +5,13 @@ import '../widgets/text_field.dart';
 class ProfilePage extends StatefulWidget {
   final String name;
   final String email;
+  final bool embedded;
 
   const ProfilePage({
     super.key,
-    this.name = 'Иванов Иван Иванович',
+    this.name = 'Бабаянц Т.А.',
     this.email = 'test123@mail.ru',
+    this.embedded = false,
   });
 
   @override
@@ -67,38 +69,34 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Профиль',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
 
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(28),
+    final content = SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(28),
 
-          child: Form(
-            key: _formKey,
+        child: Form(
+          key: _formKey,
 
-            child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.stretch,
+          child: Column(
+            crossAxisAlignment:
+            CrossAxisAlignment.stretch,
 
-              children: [
-                Center(
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundImage: AssetImage(
-                      'assets/images/profile.png',
-                    ),
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius:
+                  BorderRadius.circular(20),
+
+                  child: Image.asset(
+                    'assets/images/profile.png',
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.cover,
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
                 CustomTextFormField(
                   inputType: InputFieldType.name,
@@ -152,22 +150,33 @@ class _ProfilePageState extends State<ProfilePage> {
                   onSubmitted: _save,
                 ),
 
-                const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-                SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _save,
-                    child: const Text(
-                      'Сохранить',
-                    ),
-                  ),
+              SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _save,
+                  child:
+                  const Text('Сохранить'),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+
+    // Если профиль открыт внутри HomePage,
+    // второй Scaffold не создаём.
+    if (widget.embedded) {
+      return content;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Профиль'),
+      ),
+      body: content,
     );
   }
 }

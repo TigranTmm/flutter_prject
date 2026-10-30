@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
+import '../routes.dart';
 import '../widgets/text_field.dart';
-import 'profile_page.dart';
-import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() =>
+      _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
 
-  // Ключ позволяет обратиться к состоянию Form.
   final _formKey = GlobalKey<FormState>();
 
-  // Контроллеры хранят введённый пользователем текст.
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController =
+  TextEditingController();
+
+  final _passwordController =
+  TextEditingController();
 
   @override
   void dispose() {
-    // Контроллеры необходимо освобождать.
     _emailController.dispose();
     _passwordController.dispose();
 
@@ -30,19 +30,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() {
-    // validate() запускает validator у всех TextFormField.
-    if (_formKey.currentState?.validate() ?? false) {
+    if (_formKey.currentState?.validate() ??
+        false) {
 
-      // Снимаем фокус и закрываем клавиатуру.
       FocusScope.of(context).unfocus();
 
-      Navigator.push(
+      // После успешной авторизации
+      // удаляем предыдущие маршруты.
+      Navigator.pushNamedAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (context) => ProfilePage(
-            email: _emailController.text,
-          ),
-        ),
+        Routes.home,
+            (route) => false,
       );
     }
   }
@@ -58,7 +56,8 @@ class _LoginPageState extends State<LoginPage> {
             key: _formKey,
 
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment:
+              CrossAxisAlignment.stretch,
 
               children: [
                 const Spacer(),
@@ -67,42 +66,57 @@ class _LoginPageState extends State<LoginPage> {
                   'Добро пожаловать!',
                   style: TextStyle(
                     fontSize: 26,
-                    fontWeight: FontWeight.bold,
+                    fontWeight:
+                    FontWeight.bold,
                   ),
                 ),
 
                 const SizedBox(height: 6),
 
                 const Text(
-                  'Войдите в свой аккаунт\nили создайте новый',
-                  style: TextStyle(fontSize: 16),
+                  'Войдите в свой аккаунт\n'
+                      'или создайте новый',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
 
                 const SizedBox(height: 35),
 
                 CustomTextFormField(
-                  inputType: InputFieldType.email,
+                  inputType:
+                  InputFieldType.email,
                   labelText: 'Email',
-                  hintText: 'example@mail.com',
-                  prefixIcon: Icons.email_outlined,
-                  controller: _emailController,
-                  textInputAction: TextInputAction.next,
+                  hintText:
+                  'example@mail.com',
+                  prefixIcon:
+                  Icons.email_outlined,
+                  controller:
+                  _emailController,
+                  textInputAction:
+                  TextInputAction.next,
                 ),
 
                 const SizedBox(height: 16),
 
                 CustomTextFormField(
-                  inputType: InputFieldType.password,
+                  inputType:
+                  InputFieldType.password,
                   labelText: 'Пароль',
-                  hintText: 'Введите пароль',
-                  prefixIcon: Icons.security,
-                  controller: _passwordController,
-                  textInputAction: TextInputAction.done,
+                  hintText:
+                  'Введите пароль',
+                  prefixIcon:
+                  Icons.security,
+                  controller:
+                  _passwordController,
+                  textInputAction:
+                  TextInputAction.done,
                   onSubmitted: _login,
                 ),
 
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment:
+                  Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
                     child: const Text(
@@ -117,16 +131,16 @@ class _LoginPageState extends State<LoginPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _login,
-                    child: const Text(
-                      'Войти',
-                    ),
+                    child:
+                    const Text('Войти'),
                   ),
                 ),
 
                 const Spacer(),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment:
+                  MainAxisAlignment.center,
                   children: [
                     const Text(
                       'Нет аккаунта? ',
@@ -134,12 +148,9 @@ class _LoginPageState extends State<LoginPage> {
 
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushNamed(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                            const RegisterPage(),
-                          ),
+                          Routes.register,
                         );
                       },
                       child: const Text(
