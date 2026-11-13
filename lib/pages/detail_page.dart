@@ -1,33 +1,26 @@
 import 'package:flutter/material.dart';
 
+import '../models/application_item.dart';
 import '../routes.dart';
 
 class DetailPage extends StatelessWidget {
-  final String title;
-  final String description;
-  final String imagePath;
+  final ApplicationItem item;
 
   const DetailPage({
     super.key,
-    required this.title,
-    required this.description,
-    required this.imagePath,
+    required this.item,
   });
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-
-        backgroundColor:
-        Colors.blueAccent,
+        title: Text(item.title),
+        backgroundColor: Colors.blueAccent,
       ),
 
       body: SingleChildScrollView(
-        padding:
-        const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
 
         child: Column(
           crossAxisAlignment:
@@ -40,7 +33,7 @@ class DetailPage extends StatelessWidget {
                 BorderRadius.circular(20),
 
                 child: Image.asset(
-                  imagePath,
+                  item.imagePath,
                   height: 220,
                   width: 320,
                   fit: BoxFit.cover,
@@ -51,18 +44,17 @@ class DetailPage extends StatelessWidget {
             const SizedBox(height: 30),
 
             Text(
-              title,
+              item.title,
               style: const TextStyle(
                 fontSize: 25,
-                fontWeight:
-                FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
 
             const SizedBox(height: 20),
 
             Text(
-              description,
+              item.fullDescription,
               style: const TextStyle(
                 fontSize: 18,
                 height: 1.5,
@@ -72,24 +64,15 @@ class DetailPage extends StatelessWidget {
         ),
       ),
 
-      // Панель присутствует и здесь,
-      // как в макете методички.
-      bottomNavigationBar:
-      NavigationBar(
-
+      bottomNavigationBar: NavigationBar(
         selectedIndex: 0,
 
-        onDestinationSelected:
-            (index) {
-
+        onDestinationSelected: (index) {
           if (index == 0) {
-            // Возвращаемся назад на Home.
             Navigator.pop(context);
           }
 
           if (index == 1) {
-            // Открываем Home сразу
-            // с вкладкой профиля.
             Navigator.pushNamedAndRemoveUntil(
               context,
               Routes.home,
@@ -101,18 +84,13 @@ class DetailPage extends StatelessWidget {
 
         destinations: const [
           NavigationDestination(
-            icon:
-            Icon(Icons.home_outlined),
-            selectedIcon:
-            Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
             label: 'Главная',
           ),
-
           NavigationDestination(
-            icon:
-            Icon(Icons.person_outline),
-            selectedIcon:
-            Icon(Icons.person),
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
             label: 'Профиль',
           ),
         ],

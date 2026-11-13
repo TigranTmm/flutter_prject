@@ -1,8 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../routes.dart';
-import 'profile_page.dart';
+import '../../routes.dart';
+import '../profile_page.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/application_item.dart';
+import '../../routes.dart';
+import '../profile_page.dart';
+import 'bloc/home_bloc.dart';
 
 class HomePage extends StatefulWidget {
   final int initialIndex;
@@ -21,50 +28,6 @@ class _HomePageState extends State<HomePage> {
 
   late int _selectedIndex;
 
-  static const List<String> images = [
-    'assets/images/desktop.jpg',
-    'assets/images/mobile.webp',
-    'assets/images/web.jpg',
-    'assets/images/console.jpeg',
-    'assets/images/server.jpeg',
-  ];
-
-  static const List<String>
-  applicationNames = [
-    'Настольные приложения',
-    'Мобильные приложения',
-    'Web-приложения',
-    'Консольные приложения',
-    'Серверные приложения',
-  ];
-
-  static const List<String>
-  applicationDescriptions = [
-    'Программы, устанавливаемые и запускаемые '
-        'на персональном компьютере.',
-
-    'Приложения, предназначенные '
-        'для смартфонов и планшетов.',
-
-    'Приложения, работающие через браузер '
-        'и использующие web-технологии.',
-
-    'Программы, взаимодействие с которыми '
-        'осуществляется через командную строку.',
-
-    'Приложения, выполняющиеся на сервере '
-        'и предоставляющие услуги клиентам.',
-  ];
-
-  static const List<IconData>
-  applicationIcons = [
-    Icons.desktop_windows,
-    Icons.smartphone,
-    Icons.language,
-    Icons.terminal,
-    Icons.dns,
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -76,27 +39,54 @@ class _HomePageState extends State<HomePage> {
   // Создание карточки приложения.
   Widget _buildApplicationCard(
       BuildContext context,
-      int index,
+      ApplicationItem item,
       ) {
+    IconData icon;
+
+    switch (item.iconName) {
+      case 'desktop':
+        icon = Icons.desktop_windows;
+        break;
+
+      case 'mobile':
+        icon = Icons.smartphone;
+        break;
+
+      case 'web':
+        icon = Icons.language;
+        break;
+
+      case 'console':
+        icon = Icons.terminal;
+        break;
+
+      case 'server':
+        icon = Icons.dns;
+        break;
+
+      default:
+        icon = Icons.apps;
+    }
+
     return Card(
       elevation: 2,
 
       child: ListTile(
         leading: Icon(
-          applicationIcons[index],
+          icon,
           color: Colors.blue,
           size: 30,
         ),
 
         title: Text(
-          applicationNames[index],
+          item.title,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
 
         subtitle: Text(
-          applicationDescriptions[index],
+          item.shortDescription,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
@@ -106,21 +96,11 @@ class _HomePageState extends State<HomePage> {
           size: 18,
         ),
 
-        // Переход на экран детализации.
         onTap: () {
           Navigator.pushNamed(
             context,
             Routes.detail,
-            arguments: {
-              'title':
-              applicationNames[index],
-
-              'description':
-              applicationDescriptions[index],
-
-              'imagePath':
-              images[index],
-            },
+            arguments: item,
           );
         },
       ),
@@ -129,26 +109,19 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildHomeContent(
       BuildContext context,
+      List<ApplicationItem> applications,
       ) {
-    // Проверяем платформу.
     final bool desktopPlatform =
         kIsWeb ||
-            defaultTargetPlatform ==
-                TargetPlatform.windows ||
-            defaultTargetPlatform ==
-                TargetPlatform.macOS ||
-            defaultTargetPlatform ==
-                TargetPlatform.linux;
+            defaultTargetPlatform == TargetPlatform.windows ||
+            defaultTargetPlatform == TargetPlatform.macOS ||
+            defaultTargetPlatform == TargetPlatform.linux;
 
-    // На desktop/web вертикальные
-    // интервалы делаем больше.
     final double verticalSpacing =
     desktopPlatform ? 24 : 12;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-
-        // Главное условие адаптивности.
         final bool isWide =
             constraints.maxWidth > 600;
 
@@ -160,8 +133,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Container(
               width: double.infinity,
-              padding:
-              const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(18),
 
               decoration: BoxDecoration(
                 border: Border.all(
@@ -175,8 +147,7 @@ class _HomePageState extends State<HomePage> {
                   'Программные приложения',
                   style: TextStyle(
                     fontSize: 24,
-                    fontWeight:
-                    FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -187,9 +158,7 @@ class _HomePageState extends State<HomePage> {
             ),
 
             Container(
-              width: double.infinity,
-              padding:
-              const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(18),
 
               decoration: BoxDecoration(
                 border: Border.all(
@@ -199,13 +168,9 @@ class _HomePageState extends State<HomePage> {
               ),
 
               child: const Text(
-                'Программное приложение — '
-                    'это программа, предназначенная '
-                    'для выполнения определённых задач '
-                    'пользователя. Приложения могут '
-                    'работать на компьютерах, мобильных '
-                    'устройствах, серверах или '
-                    'непосредственно в браузере.',
+                'Программное приложение — это программа, '
+                    'предназначенная для выполнения определённых '
+                    'задач пользователя.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -222,44 +187,36 @@ class _HomePageState extends State<HomePage> {
               'Примеры приложений',
               style: TextStyle(
                 fontSize: 18,
-                fontWeight:
-                FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
 
             const SizedBox(height: 12),
 
-            // Горизонтальный список изображений.
             SizedBox(
               height: 170,
 
               child: ListView.separated(
-                scrollDirection:
-                Axis.horizontal,
+                scrollDirection: Axis.horizontal,
 
-                itemCount: images.length,
+                itemCount: applications.length,
 
-                separatorBuilder:
-                    (context, index) =>
-                const SizedBox(
-                  width: 12,
-                ),
+                separatorBuilder: (context, index) =>
+                const SizedBox(width: 12),
 
-                itemBuilder:
-                    (context, index) {
+                itemBuilder: (context, index) {
+                  final item =
+                  applications[index];
 
                   return ClipRRect(
                     borderRadius:
-                    BorderRadius.circular(
-                      18,
-                    ),
+                    BorderRadius.circular(18),
 
                     child: SizedBox(
-                      width:
-                      isWide ? 250 : 200,
+                      width: isWide ? 250 : 200,
 
                       child: Image.asset(
-                        images[index],
+                        item.imagePath,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -276,15 +233,12 @@ class _HomePageState extends State<HomePage> {
               'Виды программных приложений',
               style: TextStyle(
                 fontSize: 18,
-                fontWeight:
-                FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
 
             const SizedBox(height: 10),
 
-            // Если ширина больше 600 —
-            // карточки в два столбца.
             if (isWide)
 
               GridView.builder(
@@ -294,40 +248,33 @@ class _HomePageState extends State<HomePage> {
                 const NeverScrollableScrollPhysics(),
 
                 itemCount:
-                applicationNames.length,
+                applications.length,
 
                 gridDelegate:
                 SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-
                   crossAxisSpacing: 16,
-
                   mainAxisSpacing:
                   verticalSpacing,
-
                   childAspectRatio: 3.2,
                 ),
 
-                itemBuilder:
-                    (context, index) {
-
+                itemBuilder: (context, index) {
                   return _buildApplicationCard(
                     context,
-                    index,
+                    applications[index],
                   );
                 },
               )
 
             else
 
-            // На мобильном остаётся
-            // отдельный вертикальный ListView.
               SizedBox(
                 height: 280,
 
                 child: ListView.separated(
                   itemCount:
-                  applicationNames.length,
+                  applications.length,
 
                   separatorBuilder:
                       (context, index) =>
@@ -340,7 +287,7 @@ class _HomePageState extends State<HomePage> {
 
                     return _buildApplicationCard(
                       context,
-                      index,
+                      applications[index],
                     );
                   },
                 ),
@@ -354,50 +301,9 @@ class _HomePageState extends State<HomePage> {
 
             const SizedBox(height: 15),
 
-            Row(
-              children: [
-                Container(
-                  width: 65,
-                  height: 65,
-
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.black,
-                      width: 1.5,
-                    ),
-                  ),
-
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
-                  ),
-                ),
-
-                const SizedBox(width: 16),
-
-                Expanded(
-                  child: Container(
-                    height: 65,
-
-                    alignment:
-                    Alignment.center,
-
-                    decoration:
-                    BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 1.5,
-                      ),
-                    ),
-
-                    child: const Text(
-                      'Бабаянц Т.А. - ИКБО-63-23',
-                      textAlign:
-                      TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
+            const Text(
+              'Бабаянц Т.А. - ИКБО-63-23',
+              textAlign: TextAlign.center,
             ),
 
             SizedBox(
@@ -438,7 +344,37 @@ class _HomePageState extends State<HomePage> {
         index: _selectedIndex,
 
         children: [
-          _buildHomeContent(context),
+          BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+
+              switch (state) {
+                case HomeInitial():
+                  return const Center(
+                    child: Text(
+                      'Данные еще не загружены',
+                    ),
+                  );
+
+                case HomeLoading():
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+
+                case HomeError(:final message):
+                  return Center(
+                    child: Text(message),
+                  );
+
+                case HomeLoaded(
+                    :final applications
+                ):
+                  return _buildHomeContent(
+                    context,
+                    applications,
+                  );
+              }
+            },
+          ),
 
           const ProfilePage(
             embedded: true,

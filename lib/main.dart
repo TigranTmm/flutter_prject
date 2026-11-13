@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'pages/detail_page.dart';
-import 'pages/home_page.dart';
+import 'pages/home/home_page.dart';
 import 'pages/loading_page.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
 import 'routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'pages/home/bloc/home_bloc.dart';
+import 'models/application_item.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,31 +49,32 @@ class MyApp extends StatelessWidget {
       // Маршруты, которым нужно передавать параметры.
       onGenerateRoute: (settings) {
         if (settings.name == Routes.home) {
-          // Можно сразу открыть нужный пункт NavigationBar.
-          final initialIndex =
-              settings.arguments as int? ?? 0;
+          if (settings.name == Routes.home) {
+            final initialIndex =
+                settings.arguments as int? ?? 0;
 
-          return MaterialPageRoute(
-            settings: settings,
-            builder: (context) => HomePage(
-              initialIndex: initialIndex,
-            ),
-          );
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) => BlocProvider(
+                create: (_) => HomeBloc()
+                  ..add(const LoadApplicationsEvent()),
+
+                child: HomePage(
+                  initialIndex: initialIndex,
+                ),
+              ),
+            );
+          }
         }
 
         if (settings.name == Routes.detail) {
-          final args =
-          settings.arguments
-          as Map<String, dynamic>;
+          final item =
+          settings.arguments as ApplicationItem;
 
           return MaterialPageRoute(
             settings: settings,
             builder: (context) => DetailPage(
-              title: args['title'] as String,
-              description:
-              args['description'] as String,
-              imagePath:
-              args['imagePath'] as String,
+              item: item,
             ),
           );
         }
