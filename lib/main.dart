@@ -49,22 +49,20 @@ class MyApp extends StatelessWidget {
       // Маршруты, которым нужно передавать параметры.
       onGenerateRoute: (settings) {
         if (settings.name == Routes.home) {
-          if (settings.name == Routes.home) {
-            final initialIndex =
-                settings.arguments as int? ?? 0;
+          final initialIndex =
+              settings.arguments as int? ?? 0;
 
-            return MaterialPageRoute(
-              settings: settings,
-              builder: (context) => BlocProvider(
-                create: (_) => HomeBloc()
-                  ..add(const LoadApplicationsEvent()),
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (context) => BlocProvider(
+              create: (_) => HomeBloc()
+                ..add(const LoadApplicationsEvent()),
 
-                child: HomePage(
-                  initialIndex: initialIndex,
-                ),
+              child: HomePage(
+                initialIndex: initialIndex,
               ),
-            );
-          }
+            ),
+          );
         }
 
         if (settings.name == Routes.detail) {
